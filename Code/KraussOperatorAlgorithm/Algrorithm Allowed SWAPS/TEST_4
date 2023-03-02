@@ -58,9 +58,6 @@ def f(x):
     sigma = np.zeros((n,n))
     for i in range(len(pms)):
         sigma += (x[i]*(np.dot(np.dot(pms[i],rho(IG)),pms[i])))
-    #Define the sigma as Krauss*rho(IG)*Krauss
-    #sigma = np.zeros((n,n))
-    #for i in range(n_fac):
     f = Q_jsd(sigma,rho(CG))
     return f
 def constraint1(x):
