@@ -1,0 +1,107 @@
+import numpy as np
+import networkx as nx
+import scipy as sp
+
+beta = 2
+n=3
+#The main change is the second test is that the IG and CG are now represented correctly. Moreover the pms[] set has also been automated 
+
+#Functions for the preprocessing and importing of the graphs which we want to use.
+#function which converts a Networkx graph to a Laplacian Matrix
+def G_to_LM(x):
+    LM = sp.sparse.csr_matrix.toarray(nx.laplacian_matrix(nx.from_numpy_matrix(x)))
+    return LM
+#function which converts a numpy array of a graph to a density matrix
+def rho(x):
+    rho = sp.linalg.expm(-beta*G_to_LM(x))/np.trace((sp.linalg.expm(-beta*G_to_LM(x))))
+    return rho
+#function which determines the Q_jsd for two given density matrices
+def Q_jsd(x,y):
+    test = (x+y)/2
+    s1 = -sum(np.linalg.eig(test)[0]*np.log(np.linalg.eig(test)[0]))
+    s2 = -(sum(np.linalg.eig(x)[0]*np.log(np.linalg.eig(x)[0]))+sum(np.linalg.eig(y)[0]*np.log(np.linalg.eig(y)[0])))/2
+    f = s1-s2
+    return f 
+
+##Read in the set of graphs. This should be changed to the graphs which Median also uses. 
+G2 = nx.read_graph6('/Users/s.b.szkudlarek/Documents/1 - Study/MSc/MSc Thesis/Code/Entropy sepctrum all + data/graph3.g6')
+G2L = [None]*len(G2)
+for i in range(len(G2)):
+    G2L[i]=nx.to_numpy_array(G2[i])
+
+#Assign the graphs to the CG and IG 
+IG=G2L[2]
+#CG = np.array([[0,1,1,1,1,0],[1,0,1,1,1,1],[1,1,0,1,1,1],[1,1,1,0,1,1],[1,1,1,1,0,1],[0,1,1,1,1,0]])
+#IG = np.array([[0,1,1,1,1,1],[1,0,1,1,1,1],[1,1,0,1,1,1],[1,1,1,0,1,1],[1,1,1,1,0,1],[1,1,1,1,1,0]])
+#CG=np.array([[0,0,1,0],[0,0,0,1],[1,0,0,1],[0,1,1,0]])
+CG=G2L[3]
+
+#Optimisation function & constraints
+#generate the permutation matrices (PM)
+#pms = [np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]),np.array([[0,0,1,0],[0,1,0,0],[1,0,0,0],[0,0,0,1]]),np.array([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]]),np.array([[1,0,0,0],[0,0,0,1],[0,0,1,0],[0,1,0,0]])]
+#generate the permutation matrices (PM)
+pms = [np.identity(n)]
+for j in range(n):
+    for i in range(n-j):
+        if CG[j][i+j]==1:
+            swap_allowed=np.identity(n)
+            swap_allowed[i+j][i+j]=0
+            swap_allowed[j][j]=0
+            swap_allowed[i+j][j]=1
+            swap_allowed[j][i+j]=1
+            pms.append(swap_allowed)
+
+#Define the function which we want to optimize 
+def f(x):
+    f = 0
+    #define the krauss operator in terms of the PM and x
+    E = np.zeros((n,n))
+    for i in range(len(pms)):
+        E += (x[i]*pms[i])
+    #Define the sigma as Krauss*rho(IG)*Krauss
+    #sigma = np.zeros((n,n))
+    #for i in range(n_fac):
+    sigma = (np.dot(np.dot(E,rho(CG)),E.T))
+    f = Q_jsd(sigma,rho(IG))
+    return f
+def constraint1(x):
+    return np.array([(x).sum()-1])
+def constraint2(x):
+    return x - 1e-30
+def constraint3(x):
+    #define the krauss operator in terms of the PM and x
+    E = np.zeros((n,n))
+    for i in range(len(pms)):
+        E += (x[i]*pms[i])
+        ##np.sqrt((np.sum(np.linalg.eig(np.dot(E,E.T)-np.eye(n))[0])**2))
+    return (E)    
+
+#Starting value for the optimisation
+x0 = np.random.uniform(0,1,len(pms))
+#Format the constraints for Optimisation
+con1 = {'type': 'eq', 'fun': constraint1}
+con2 = {'type': 'ineq', 'fun': constraint2}
+
+cons=[con1,con2]
+
+#Optimize for the function f 
+sol = sp.optimize.minimize(f,x0,constraints=cons,method='SLSQP')
+
+#print the results in such a manner that they can be analysed
+res = []
+index = []
+P = []
+for i in range(len(pms)):
+    res.append(sol.x[i])
+    index.append(i)
+    P.append(pms[i])
+
+print(res,index)
+print(P)
+print(sum(P))
+print(constraint3(sol.x))
+print(np.dot(constraint3(sol.x),constraint3(sol.x).T))
+print(np.dot(sum(P),sum(P).T))
+print(Q_jsd(rho(IG),rho(CG)))
+print(sol.fun)
+print(x0)
