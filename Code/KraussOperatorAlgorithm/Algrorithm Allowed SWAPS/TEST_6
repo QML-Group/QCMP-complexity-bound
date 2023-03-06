@@ -2,7 +2,7 @@ import numpy as np
 import networkx as nx
 import scipy as sp
 
-beta = 2
+beta = 4
 n=3
 #The main change is the second test is that the IG and CG are now represented correctly. Moreover the pms[] set has also been automated 
 
@@ -28,7 +28,10 @@ def rho_sev(x):
     for i in range(n):
         norm += G_to_LM_sev(x)[i][i]
     rho = G_to_LM_sev(x)/norm
-    return rho
+    rho_fin = np.zeros((n,n))
+    for i in range(n):
+        rho_fin[i][i] = np.linalg.eig(rho)[0][i]
+    return rho_fin
 #function which determines the Q_jsd for two given density matrices
 def Q_jsd(x,y):
     test = (x+y)/2
@@ -81,9 +84,9 @@ def f(x):
     #define the krauss operator in terms of the PM and x
     sigma = np.zeros((n,n))
     for i in range(len(pms)):
-        sigma += (x[i]*(np.dot(np.dot(pms[i],rho(IG)),pms[i])))
+        sigma += (x[i]*(np.dot(np.dot(pms[i],rho_sev(IG)),pms[i])))
         sigma_proj = np.dot(np.dot(P1,sigma),P1)
-    f = Q_jsd(sigma,rho(CG))
+    f = Q_jsd(sigma,rho_sev(CG))
     return f
 def constraint1(x):
     return np.array([np.sum(x)-1])
@@ -112,7 +115,7 @@ cons=[con1]
 
 index = []
 P = []
-print(Q_jsd(rho(IG),rho(CG)))
+print(Q_jsd(rho_sev(IG),rho_sev(CG)))
 
 x0 = np.random.uniform(0,1,len(pms))
 sol = sp.optimize.minimize(f,x0,constraints=cons,bounds=bounds,method='SLSQP')
