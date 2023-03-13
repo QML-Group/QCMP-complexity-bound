@@ -54,7 +54,6 @@ P8 =np.array([[0,0,1],[0,0,0],[1,0,0]])
 
 #Optimisation function & constraints
 #generate the permutation matrices (PM)
-#pms = [np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]),np.array([[0,0,1,0],[0,1,0,0],[1,0,0,0],[0,0,0,1]]),np.array([[1,0,0,0],[0,1,0,0],[0,0,0,1],[0,0,1,0]]),np.array([[1,0,0,0],[0,0,0,1],[0,0,1,0],[0,1,0,0]])]
 #generate the permutation matrices (PM)
 pms = []
 for j in range(n):
@@ -89,7 +88,8 @@ bounds = [(0,1)]
 cons=[con1]
 #Optimize for the function f 
 #Generate a random set of theta's with a value between 0-1
-x0 = np.random.uniform(0,1,len(pms))
+#x0 = np.random.uniform(0,1,len(pms))
+x0=np.array([.5, .9, .9])
 #Preform the optimizatoion
 sol = sp.optimize.minimize(f,x0,constraints=cons,bounds=bounds,method='SLSQP')
 
