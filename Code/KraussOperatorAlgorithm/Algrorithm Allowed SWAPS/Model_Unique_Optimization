@@ -11,21 +11,22 @@ n=3
 #function which converts a Networkx graph to a Laplacian Matrix
 def G_to_LM(x):
     LM = sp.sparse.csr_matrix.toarray(nx.laplacian_matrix(nx.from_numpy_matrix(x)))
-    L = np.zeros((n,n))
-    for i in range(n):
-        L[i][i]=np.linalg.eig(LM)[0][i]
-    return L
+    return LM
+def G_to_LM_eig(x):
+    LM = sp.sparse.csr_matrix.toarray(nx.laplacian_matrix(nx.from_numpy_matrix(x)))
+    return LM
 #function which converts a numpy array of a graph to a density matrix
 def rho(x):
-    rho = sp.linalg.expm(-beta*G_to_LM(x))/np.trace((sp.linalg.expm(-beta*G_to_LM(x))))
+    rho = sp.linalg.expm(-beta*G_to_LM(x))/np.trace((sp.linalg.expm(-beta*G_to_LM_eig(x))))
     return rho
+#function which determines the Von Neuman Entropy of a density matrix
+def S(x):
+    return -sum(np.linalg.eig(x)[0]*np.log2(np.linalg.eig(x)[0]))
 #function which determines the Q_jsd for two given density matrices
 def Q_jsd(x,y):
-    test = (x+y)/2
-    s1 = -sum(np.linalg.eig(test)[0]*np.log(np.linalg.eig(test)[0]))
-    s2 = -(sum(np.linalg.eig(x)[0]*np.log(np.linalg.eig(x)[0]))+sum(np.linalg.eig(y)[0]*np.log(np.linalg.eig(y)[0])))/2
-    f = s1-s2
-    return f 
+    sum_xy = (x+y)/2
+    f = S(sum_xy)-(S(x)+S(y))/2
+    return f
 
 ##Read in the set of graphs. This should be changed to the graphs which Median also uses. 
 G2 = nx.read_graph6('/Users/s.b.szkudlarek/Documents/1 - Study/MSc/MSc Thesis/Code/Entropy sepctrum all + data/graph3.g6')
@@ -39,6 +40,7 @@ IG=G2L[3]
 #IG = np.array([[0,1,1,1,1,1],[1,0,1,1,1,1],[1,1,0,1,1,1],[1,1,1,0,1,1],[1,1,1,1,0,1],[1,1,1,1,1,0]])
 #CG=np.array([[0,0,1,0],[0,0,0,1],[1,0,0,1],[0,1,1,0]])
 CG=G2L[2]
+#CG=np.array([[0,1,1],[1,0,0],[1,0,0]])
 
 #Define the projectors we want to use in the 3x3 model 
 P1 =np.array([[1,0,0],[0,0,0],[0,0,0]])
@@ -71,59 +73,37 @@ def f(x):
     #define the krauss operator in terms of the PM and x
     sigma = np.zeros((n,n))
     for i in range(len(pms)):
-        sigma += (x[i]*(np.dot(np.dot(pms[i],rho(IG)),pms[i])))
-        sigma_proj = np.dot(np.dot(P1,sigma),P1)
+        sigma += ((np.dot(np.dot(np.sqrt(x[i])*pms[i],rho(IG)),np.sqrt(x[i])*pms[i])))
+        #sigma_proj = np.dot(np.dot(P1,sigma),P1)
     f = Q_jsd(sigma,rho(CG))
     return f
 def constraint1(x):
-    return np.array([np.sum(x)-1])
-def constraint2(x):
-    return x + 1
-def constraint3(x):
-    #define the krauss operator in terms of the PM and x
-    E = np.zeros((n,n))
-    for i in range(len(pms)):
-        E += (x[i]*np.dot(pms[i],pms[i]))
-        ##np.sqrt((np.sum(np.linalg.eig(np.dot(E,E.T)-np.eye(n))[0])**2))
-    return (E)    
+    return np.array([np.sum(x)-1])   
 
 #Starting value for the optimisation
 
 #x0=np.ones(len(pms), dtype=float)/n
 #Format the constraints for Optimisation
 con1 = {'type': 'eq', 'fun': constraint1}
-con2 = {'type': 'ineq', 'fun': constraint2}
 bounds = [(0,1)]
-
 cons=[con1]
-
-
 #Optimize for the function f 
-
-index = []
-P = []
-print(Q_jsd(rho(IG),rho(CG)))
-
+#Generate a random set of theta's with a value between 0-1
 x0 = np.random.uniform(0,1,len(pms))
+#Preform the optimizatoion
 sol = sp.optimize.minimize(f,x0,constraints=cons,bounds=bounds,method='SLSQP')
 
 #print the results in such a manner that they can be analysed
+index = []
+P = []
 res = []
 for i in range(len(pms)):
     res.append(sol.x[i])
     index.append(i)
     P.append(pms[i])
-print(res,P)
-#print(x0)
-print(f(x0),sol.fun)
+print(res)
 print(x0)
-
-#print(res,index)
+print(P)
 #print(x0)
-#print(P)
-#print(constraint3(sol.x))
-#print(np.dot(constraint3(sol.x),constraint3(sol.x).T))
-#print(np.dot(sum(P),sum(P).T))
-#print(Q_jsd(rho(IG),rho(CG)))
-#print(sol.fun)
-
+print(f(x0),sol.fun,Q_jsd(rho(IG),rho(CG)))
+print(f(x0)-sol.fun,Q_jsd(rho(IG),rho(CG))-sol.fun)
