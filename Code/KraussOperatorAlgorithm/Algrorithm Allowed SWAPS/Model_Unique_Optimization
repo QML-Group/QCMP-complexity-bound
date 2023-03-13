@@ -14,7 +14,10 @@ def G_to_LM(x):
     return LM
 def G_to_LM_eig(x):
     LM = sp.sparse.csr_matrix.toarray(nx.laplacian_matrix(nx.from_numpy_matrix(x)))
-    return LM
+    L = np.zeros((n,n))
+    for i in range(n):
+        L[i][i]=np.linalg.eig(LM)[0][i]
+    return L
 #function which converts a numpy array of a graph to a density matrix
 def rho(x):
     rho = sp.linalg.expm(-beta*G_to_LM(x))/np.trace((sp.linalg.expm(-beta*G_to_LM_eig(x))))
