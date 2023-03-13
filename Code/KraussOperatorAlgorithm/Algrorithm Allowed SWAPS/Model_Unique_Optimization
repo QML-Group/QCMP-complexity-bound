@@ -79,13 +79,10 @@ def f(x):
         #sigma_proj = np.dot(np.dot(P1,sigma),P1)
     f = Q_jsd(sigma,rho(CG))
     return f
+
+#Format the constraints for Optimisation
 def constraint1(x):
     return np.array([np.sum(x)-1])   
-
-#Starting value for the optimisation
-
-#x0=np.ones(len(pms), dtype=float)/n
-#Format the constraints for Optimisation
 con1 = {'type': 'eq', 'fun': constraint1}
 bounds = [(0,1)]
 cons=[con1]
