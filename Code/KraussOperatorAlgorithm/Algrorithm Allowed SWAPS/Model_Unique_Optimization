@@ -104,6 +104,5 @@ for i in range(len(pms)):
 print(res)
 print(x0)
 print(P)
-#print(x0)
 print(f(x0),sol.fun,Q_jsd(rho(IG),rho(CG)))
 print(f(x0)-sol.fun,Q_jsd(rho(IG),rho(CG))-sol.fun)
