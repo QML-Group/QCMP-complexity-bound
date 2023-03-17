@@ -88,10 +88,10 @@ bounds = [(0,1)]
 cons=[con1]
 #Optimize for the function f 
 #Generate a random set of theta's with a value between 0-1
-#x0 = np.random.uniform(0,1,len(pms))
-x0=np.array([.5, .9, .9])
+x0 = np.random.uniform(0,1,len(pms))
+#x0=np.array([.5, .5, .5])
 #Preform the optimizatoion
-sol = sp.optimize.minimize(f,x0,constraints=cons,bounds=bounds,method='SLSQP')
+sol = sp.optimize.minimize(f,x0,constraints=cons,bounds=bounds,method='SLSQP',tol=1e-18)
 
 #print the results in such a manner that they can be analysed
 index = []
@@ -101,6 +101,7 @@ for i in range(len(pms)):
     res.append(sol.x[i])
     index.append(i)
     P.append(pms[i])
+print(sol)
 print(res)
 print(x0)
 print(P)
