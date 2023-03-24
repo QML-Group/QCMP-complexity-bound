@@ -3,7 +3,7 @@ import networkx as nx
 import scipy as sp
 
 beta = 2
-n=6
+n=4
 #The main change is the second test is that the IG and CG are now represented correctly. Moreover the pms[] set has also been automated. Furthermore the projects 
 #for the 3 vertex model have been added these will still need to be automated once we have established the correct use of the projectors. 
 
@@ -38,22 +38,11 @@ for i in range(len(G2)):
     G2L[i]=nx.to_numpy_array(G2[i])
 
 #Assign the graphs to the CG and IG 
-#IG=G2L[8]
-#CG=G2L[7]
-#CG = np.array([[0,1,1,1,1,0],[1,0,1,1,1,1],[1,1,0,1,1,1],[1,1,1,0,1,1],[1,1,1,1,0,1],[0,1,1,1,1,0]])
-#IG = np.array([[0,1,1,1,1,1],[1,0,1,1,1,1],[1,1,0,1,1,1],[1,1,1,0,1,1],[1,1,1,1,0,1],[1,1,1,1,1,0]])
-IG = np.array([[0,0,0,0,1,0],[0,0,0,0,1,0],[0,0,0,0,0,1],[0,0,0,0,0,1],[1,1,0,0,0,0],[0,0,1,1,0,0]])
-#CG=np.array([[0,0,1,0],[0,0,0,1],[1,0,0,1],[0,1,1,0]])
-#CG = np.array([[0,1,0,1,0,0],[1,0,1,0,0,0],[0,1,0,1,0,0],[1,0,1,0,1,0],[0,0,0,1,0,1],[0,0,0,0,1,0]])
+IG=G2L[8]
+#CG = np.array([[0,1,0,0,0,0],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[0,0,0,0,1,0]])
 #IG = np.array([[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]])
-#CG = np.array([[0,1,1,0,0,0],[1,0,0,0,0,0],[1,0,0,1,0,0],[0,0,1,0,0,1],[0,0,0,0,0,1],[0,0,0,1,1,0]])
-#IG = np.array([[0,0,0,0,0,1],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[1,0,0,0,0,0]])
-#CG = np.array([[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]])
-#IG = np.array([[0,1,0,0,0,1],[1,0,1,0,1,0],[0,1,0,1,0,1],[0,0,1,0,1,0],[0,1,0,1,0,1],[1,0,1,0,1,0]])
-#CG = np.array([[0,1,0,1,0,0],[1,0,0,0,0,1],[0,0,0,1,1,0],[1,0,1,0,0,0],[0,0,1,0,0,1],[0,1,0,0,1,0]])
-CG = np.array([[0,0,1,1,0,0],[0,0,0,1,0,1],[1,0,0,0,1,0],[1,1,0,0,0,0],[0,0,1,0,0,1],[0,1,0,0,1,0]])
-#IG = np.array([[0,0,0,0,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1],[0,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0]])
-
+#CG=np.array([[0,0,1,0],[0,0,0,1],[1,0,0,1],[0,1,1,0]])
+CG=G2L[6]
 #CG=np.array([[0,1,1],[1,0,0],[1,0,0]])
 
 #Define the projectors we want to use in the 3x3 model 
@@ -86,32 +75,56 @@ def f(x):
     #define the krauss operator in terms of the PM and x
     #Make a second loop which allows for a SUM of Kraus operators. 
     sigma = np.zeros((n,n))
-    for i in range(len(pms)):
-        sigma += ((np.dot(np.dot(np.sqrt(x[i])*pms[i],rho(CG)),np.sqrt(x[i])*pms[i])))
+    sigma_E = np.zeros((n,n))
+    for j in range(n):
+        for i in range(len(pms)):
+            sigma += np.sqrt(x[i+j*len(pms)])*pms[i]
+        sigma_E += ((np.dot(np.dot(sigma,rho(CG)),sigma)))
         #sigma_proj = np.dot(np.dot(P1,sigma),P1)
-    f = Q_jsd(sigma,rho(IG))
+    f = Q_jsd(sigma_E,rho(IG))
     return f
+#Check that the Kraus meet the constraint EE=1
+def Kraus(x):
+    sigma = np.zeros((n,n))
+    sigma_E = np.zeros((n,n))
+    for j in range(n):
+        for i in range(len(pms)):
+            sigma += np.sqrt(x[i+j])*pms[i]
+        sigma_E += np.dot(sigma,sigma)
+    return sigma_E
+
 
 #Format the constraints for Optimisation
 def constraint1(x):
-    return np.array([np.sum(x)-1])   
+    return np.array([np.sum(x)-1])
+def constraint2(x):
+    return np.trace(Kraus(x))-n
+def constraint3(x):
+    off_dia_sum = np.sum(Kraus(x)) - np.trace(Kraus(x))
+    return off_dia_sum - 1e-9
 con1 = {'type': 'eq', 'fun': constraint1}
+con2 = {'type': 'eq', 'fun': constraint2}
+con3 = {'type': 'eq', 'fun': constraint3}
 bounds = [(0,1)]
-cons=[con1]
-#Optimize for the function f 
+cons=[con1,con2,con3]
+options = {"maxiter": 5000}
+#Optimize for the function f
 #Generate a random set of theta's with a value between 0-1
-x0 = np.random.uniform(0,1,len(pms))
-#x0=np.array([.2, .2])
+x0 = np.random.uniform(0,1,len(pms)*n)
+#x0=np.array([.1, .1, .1,.1,.1,.1])
+#x0=np.ones((n*len(pms)))/(n*len(pms))
+#x0 = np.array([0.98638881, 0.02834641, 0.46020884, 0.37974833, 0.84604831, 0.54845057])
 #Preform the optimizatoion
-sol = sp.optimize.minimize(f,x0,constraints=cons,bounds=bounds,method='SLSQP',tol=1e-18)
+sol = sp.optimize.minimize(f,x0,constraints=cons,bounds=bounds,method='SLSQP',options=options)
 
 #print the results in such a manner that they can be analysed
 index = []
 P = []
 res = []
-for i in range(len(pms)):
+for i in range(len(pms)*n):
     res.append(sol.x[i])
     index.append(i)
+for i in range(len(pms)):
     P.append(pms[i])
 print(sol)
 print(res)
@@ -119,3 +132,4 @@ print(x0)
 print(P)
 print(f(x0),Q_jsd(rho(IG),rho(CG)),sol.fun)
 print(f(x0)-sol.fun,Q_jsd(rho(IG),rho(CG))-sol.fun)
+print(Kraus(sol.x))
