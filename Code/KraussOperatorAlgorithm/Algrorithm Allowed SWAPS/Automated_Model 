@@ -5,6 +5,10 @@ import time
 
 start_time=time.time()
 
+beta = 2
+n=6
+SWAPS = []
+
 ##Read in the set of graphs. This should be changed to the graphs which Median also uses. 
 G2 = nx.read_graph6('/Users/s.b.szkudlarek/Documents/1 - Study/MSc/MSc Thesis/Code/Entropy sepctrum all + data/graph4.g6')
 G2L = [None]*len(G2)
@@ -40,8 +44,8 @@ for i in range(len(G2)):
 #CG = np.array([[0,0,0,0,1,1],[0,0,1,1,0,0],[0,1,0,0,0,1],[0,1,0,0,1,0],[1,0,0,1,0,0],[1,0,1,0,0,0]])
 #IG = np.array([[0,0,0,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[1,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]])
 #Graphs Medina 3 - 3 SWAPS
-CG = np.array([[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]])
-IG = np.array([[0,1,1,0,0,1],[1,0,1,0,0,1],[1,1,0,1,0,1],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,1,1,0,1,0]])
+#CG = np.array([[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]])
+#IG = np.array([[0,1,1,0,0,1],[1,0,1,0,0,1],[1,1,0,1,0,1],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,1,1,0,1,0]])
 #CG = np.array([[0,1,1,0,0,0],[1,0,0,0,0,1],[1,0,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[0,1,0,0,1,0]])
 #IG = np.array([[0,0,1,0,0,0],[0,0,0,0,0,1],[1,0,0,0,0,1],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,1,1,0,0,0]])
 #CG = np.array([[0,0,1,1,0,0],[0,0,1,0,0,1],[1,0,1,0,0,0],[1,0,0,0,1,0],[0,0,0,1,0,1],[0,1,0,0,1,0]])
@@ -71,10 +75,6 @@ IG = np.array([[0,1,1,0,0,1],[1,0,1,0,0,1],[1,1,0,1,0,1],[0,0,1,0,1,0],[0,0,0,1,
 #CG = CG_swap(5,0,CG3)
 #IG = IG_iteration(IG3,CG3)
 
-
-beta = 2
-n=6
-SWAPS = []
 #Functions for the preprocessing and importing of the graphs which we want to use.
 #function which converts a Networkx graph to a Laplacian Matrix
 def G_to_LM(x):
@@ -141,7 +141,6 @@ def permutation_matrix(CG):
                 pms.append(swap_allowed)
     return pms, swap_index
 
-
 def optimize(CG,IG):
     pms = permutation_matrix(CG)[0]
     swap_index = permutation_matrix(CG)[1]
@@ -195,9 +194,5 @@ while np.sum(IG_iteration(IG,CG))!=0:
     IG = IG_iteration(IG,CG)
     CG = CG_swap(s[i][0],s[i][1],CG)
     i+=1
-    print(IG)
-    print(CG)
     
-
 print(SWAPS, len(SWAPS))
-
