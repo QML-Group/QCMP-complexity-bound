@@ -1,12 +1,80 @@
 import numpy as np
 import networkx as nx
 import scipy as sp
+import time 
+
+start_time=time.time()
+
+##Read in the set of graphs. This should be changed to the graphs which Median also uses. 
+G2 = nx.read_graph6('/Users/s.b.szkudlarek/Documents/1 - Study/MSc/MSc Thesis/Code/Entropy sepctrum all + data/graph4.g6')
+G2L = [None]*len(G2)
+for i in range(len(G2)):
+    G2L[i]=nx.to_numpy_array(G2[i])
+
+#Assign the graphs to the CG and IG 
+#IG=G2L[8]
+#CG=G2L[7]
+#CG = np.array([[0,1,1,1,1,0],[1,0,1,1,1,1],[1,1,0,1,1,1],[1,1,1,0,1,1],[1,1,1,1,0,1],[0,1,1,1,1,0]])
+#IG = np.array([[0,1,1,1,1,1],[1,0,1,1,1,1],[1,1,0,1,1,1],[1,1,1,0,1,1],[1,1,1,1,0,1],[1,1,1,1,1,0]])
+#IG = np.array([[0,0,0,0,1,0],[0,0,0,0,1,0],[0,0,0,0,0,1],[0,0,0,0,0,1],[1,1,0,0,0,0],[0,0,1,1,0,0]])
+#CG=np.array([[0,0,1,0],[0,0,0,1],[1,0,0,1],[0,1,1,0]])
+#CG = np.array([[0,1,0,1,0,0],[1,0,1,0,0,0],[0,1,0,1,0,0],[1,0,1,0,1,0],[0,0,0,1,0,1],[0,0,0,0,1,0]])
+#IG = np.array([[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]])
+#CG = np.array([[0,1,1,0,0,0],[1,0,0,0,0,0],[1,0,0,1,0,0],[0,0,1,0,0,1],[0,0,0,0,0,1],[0,0,0,1,1,0]])
+#IG = np.array([[0,0,0,0,0,1],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[1,0,0,0,0,0]])
+#CG = np.array([[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]])
+#IG = np.array([[0,1,0,0,0,1],[1,0,1,0,1,0],[0,1,0,1,0,1],[0,0,1,0,1,0],[0,1,0,1,0,1],[1,0,1,0,1,0]])
+#CG = np.array([[0,1,0,1,0,0],[1,0,0,0,0,1],[0,0,0,1,1,0],[1,0,1,0,0,0],[0,0,1,0,0,1],[0,1,0,0,1,0]])
+#CG = np.array([[0,0,1,1,0,0],[0,0,0,1,0,1],[1,0,0,0,1,0],[1,1,0,0,0,0],[0,0,1,0,0,1],[0,1,0,0,1,0]])
+#IG = np.array([[0,0,0,0,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1],[0,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0]])
+#Graphs Medina 1 - 2 SWAPS
+#CG = np.array([[0,0,1,0,0],[0,0,1,0,0],[1,1,0,1,1],[0,0,1,0,0],[0,0,1,0,0]])
+#IG = np.array([[0,1,1,0,0],[1,0,1,0,0],[1,1,0,1,1],[0,0,1,0,1],[0,0,1,1,0]])
+#CG = np.array([[0,1,1,1,1],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0]])
+#IG = np.array([[0,1,0,0,0],[1,0,0,0,0],[0,0,0,0,0],[0,0,0,0,1],[0,0,0,1,0]])
+#Graphs Medina 2 - 3 SWAPS
+#CG = np.array([[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]])
+#IG = np.array([[0,1,1,1,0,1],[1,0,1,0,0,0],[1,1,0,1,0,0],[1,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]])
+#CG = np.array([[0,0,1,0,0,1],[0,0,1,1,0,0],[1,1,0,0,0,0],[0,1,0,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]])
+#IG = np.array([[0,0,1,1,0,0],[0,0,0,0,0,0],[1,0,0,0,0,0],[1,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]])
+#CG = np.array([[0,0,0,0,1,1],[0,0,1,1,0,0],[0,1,0,0,0,1],[0,1,0,0,1,0],[1,0,0,1,0,0],[1,0,1,0,0,0]])
+#IG = np.array([[0,0,0,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[1,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]])
+#Graphs Medina 3 - 3 SWAPS
+CG = np.array([[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]])
+IG = np.array([[0,1,1,0,0,1],[1,0,1,0,0,1],[1,1,0,1,0,1],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,1,1,0,1,0]])
+#CG = np.array([[0,1,1,0,0,0],[1,0,0,0,0,1],[1,0,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[0,1,0,0,1,0]])
+#IG = np.array([[0,0,1,0,0,0],[0,0,0,0,0,1],[1,0,0,0,0,1],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,1,1,0,0,0]])
+#CG = np.array([[0,0,1,1,0,0],[0,0,1,0,0,1],[1,0,1,0,0,0],[1,0,0,0,1,0],[0,0,0,1,0,1],[0,1,0,0,1,0]])
+#IG = np.array([[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,1],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,1,0,0,0]])
+#Graphs Medina 4 - 2 SWAPS (THIS EXAMPLE GIVES THE COMPLEX ERROR)
+#CG = np.array([[0,0,0,0,1],[0,0,0,0,1],[0,0,0,0,1],[0,0,0,0,1],[1,1,1,1,0]])
+#IG = np.array([[0,1,0,1,1],[1,0,1,0,1],[0,1,0,1,1],[1,0,1,0,1],[1,1,1,1,0]])
+#CG = np.array([[0,1,1,1,1],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0]])
+#IG = np.array([[0,1,0,1,0],[1,0,1,0,0],[0,1,0,1,0],[1,0,1,0,0],[0,0,0,0,0]])
+#Graphs Medina 5 - 2 SWAPS 
+#CG = np.array([[0,0,0,0,1],[0,0,0,0,1],[0,0,0,0,1],[0,0,0,0,1],[1,1,1,1,0]])
+#IG = np.array([[0,1,1,1,1],[1,0,1,0,0],[1,1,0,1,0],[1,0,1,0,1],[1,0,0,1,0]])
+#CG2 = CG_swap(0,4,CG1)
+#IG2 = IG_iteration(IG1,CG1)
+#CG = CG_swap(0,2,CG2)
+#IG = IG_iteration(IG2,CG2)
+#At this step np.sum(IG_iteration(IG,CG))=0 and the code can stop
+
+#Graphs Medina 6 - .. SWAPS
+#CG = np.array([[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]])
+#IG_bad = np.array([[0,1,1,0,0,0],[1,0,1,1,1,0],[1,1,0,1,1,0],[0,1,1,0,0,1],[0,1,1,1,0,1],[0,0,0,1,1,0]])
+#IG = np.array([[0,1,0,0,0,1],[1,0,1,0,1,1],[0,1,0,1,0,1],[0,0,1,0,1,0],[0,1,0,1,0,1],[1,1,1,0,1,0]])
+#CG2 = CG_swap(1,0,CG1)
+#IG2 = IG_iteration(IG1,CG1)
+#CG3 = CG_swap(5,1,CG2)
+#IG3 = IG_iteration(IG2,CG2)
+#CG = CG_swap(5,0,CG3)
+#IG = IG_iteration(IG3,CG3)
+
 
 beta = 2
-n=5
-#The main change is the second test is that the IG and CG are now represented correctly. Moreover the pms[] set has also been automated. Furthermore the projects 
-#for the 3 vertex model have been added these will still need to be automated once we have established the correct use of the projectors. 
-
+n=6
+SWAPS = []
 #Functions for the preprocessing and importing of the graphs which we want to use.
 #function which converts a Networkx graph to a Laplacian Matrix
 def G_to_LM(x):
@@ -31,96 +99,105 @@ def Q_jsd(x,y):
     f = S(sum_xy)-(S(x)+S(y))/2
     return f
 
-##Read in the set of graphs. This should be changed to the graphs which Median also uses. 
-G2 = nx.read_graph6('/Users/s.b.szkudlarek/Documents/1 - Study/MSc/MSc Thesis/Code/Entropy sepctrum all + data/graph4.g6')
-G2L = [None]*len(G2)
-for i in range(len(G2)):
-    G2L[i]=nx.to_numpy_array(G2[i])
-
-#Assign the graphs to the CG and IG 
-#IG=G2L[8]
-#CG=G2L[7]
-#CG = np.array([[0,1,1,1,1,0],[1,0,1,1,1,1],[1,1,0,1,1,1],[1,1,1,0,1,1],[1,1,1,1,0,1],[0,1,1,1,1,0]])
-#IG = np.array([[0,1,1,1,1,1],[1,0,1,1,1,1],[1,1,0,1,1,1],[1,1,1,0,1,1],[1,1,1,1,0,1],[1,1,1,1,1,0]])
-#IG = np.array([[0,0,0,0,1,0],[0,0,0,0,1,0],[0,0,0,0,0,1],[0,0,0,0,0,1],[1,1,0,0,0,0],[0,0,1,1,0,0]])
-#CG=np.array([[0,0,1,0],[0,0,0,1],[1,0,0,1],[0,1,1,0]])
-#CG = np.array([[0,1,0,1,0,0],[1,0,1,0,0,0],[0,1,0,1,0,0],[1,0,1,0,1,0],[0,0,0,1,0,1],[0,0,0,0,1,0]])
-#IG = np.array([[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]])
-#CG = np.array([[0,1,1,0,0,0],[1,0,0,0,0,0],[1,0,0,1,0,0],[0,0,1,0,0,1],[0,0,0,0,0,1],[0,0,0,1,1,0]])
-#IG = np.array([[0,0,0,0,0,1],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[1,0,0,0,0,0]])
-#CG = np.array([[0,1,0,0,0,1],[1,0,1,0,0,0],[0,1,0,1,0,0],[0,0,1,0,1,0],[0,0,0,1,0,1],[1,0,0,0,1,0]])
-#IG = np.array([[0,1,0,0,0,1],[1,0,1,0,1,0],[0,1,0,1,0,1],[0,0,1,0,1,0],[0,1,0,1,0,1],[1,0,1,0,1,0]])
-#CG = np.array([[0,1,0,1,0,0],[1,0,0,0,0,1],[0,0,0,1,1,0],[1,0,1,0,0,0],[0,0,1,0,0,1],[0,1,0,0,1,0]])
-#CG = np.array([[0,0,1,1,0,0],[0,0,0,1,0,1],[1,0,0,0,1,0],[1,1,0,0,0,0],[0,0,1,0,0,1],[0,1,0,0,1,0]])
-#IG = np.array([[0,0,0,0,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1],[0,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0]])
-#Graphs Medina 1
-#CG = np.array([[0,0,1,0,0],[0,0,1,0,0],[1,1,0,1,1],[0,0,1,0,0],[0,0,1,0,0]])
-#IG = np.array([[0,1,1,0,0],[1,0,1,0,0],[1,1,0,1,1],[0,0,1,0,1],[0,0,1,1,0]])
-CG = np.array([[0,1,1,1,1],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0]])
-IG = np.array([[0,1,0,0,0],[1,0,0,0,0],[0,0,0,0,0],[0,0,0,0,1],[0,0,0,1,0]])
-
-
-#CG=np.array([[0,1,1],[1,0,0],[1,0,0]])
-
-#Define the projectors we want to use in the 3x3 model 
-P1 =np.array([[1,0,0],[0,0,0],[0,0,0]])
-P2 =np.array([[0,0,0],[0,1,0],[0,0,0]])
-P3 =np.array([[0,0,0],[0,0,0],[0,0,1]])
-P4 =np.array([[1,0,0],[0,1,0],[0,0,0]])
-P5 =np.array([[0,0,0],[0,1,0],[0,0,1]])
-P6 =np.array([[0,1,0],[1,0,0],[0,0,0]])
-P7 =np.array([[0,0,0],[0,0,1],[0,1,0]])
-P8 =np.array([[0,0,1],[0,0,0],[1,0,0]])
+#function which determines the IG once the intial CG has been performed, in which y is the CG and x the IG 
+def IG_iteration(x,y):
+    IG_new = x-y
+    IG_new[IG_new<0]=0
+    return IG_new
+#function which determines the new CG based on the SWAP we would like to perform. In which z is the CG and x&y are the node to be swapped. 
+def CG_swap(x,y,z):
+    CG_new = z.copy()
+    for i in range(n):
+        if z[x][i]==1 and i!=y:
+            CG_new[y][i]=1
+            CG_new[x][i]=0
+            CG_new[i][y]=1
+            CG_new[i][x]=0
+    for i in range(n):
+        if z[y][i]==1 and i!=x:
+            CG_new[x][i]=1
+            CG_new[y][i]=0
+            CG_new[i][x]=1
+            CG_new[i][y]=0
+    return CG_new
 
 #Optimisation function & constraints
 #generate the permutation matrices (PM)
-#generate the permutation matrices (PM)
-pms = []
-for j in range(n):
-    for i in range(n-j):
-        if CG[j][i+j]==1:
-            swap_allowed=np.identity(n)
-            swap_allowed[i+j][i+j]=0
-            swap_allowed[j][j]=0
-            swap_allowed[i+j][j]=1
-            swap_allowed[j][i+j]=1
-            pms.append(swap_allowed)
+def permutation_matrix(CG):
+    pms = []
+    swap_index = []
+    for j in range(n):
+        for i in range(n-j):
+            if CG[j][i+j]==1:
+                swap_allowed=np.identity(n)
+                swap_allowed[i+j][i+j]=0
+                swap_allowed[j][j]=0
+                swap_allowed[i+j][j]=1
+                swap_allowed[j][i+j]=1
+                index=[None]*2
+                index[0]=i+j
+                index[1]=j
+                swap_index.append(index)
+                pms.append(swap_allowed)
+    return pms, swap_index
 
-#Define the function which we want to optimize 
-def f(x):
-    f = 0
-    #define the krauss operator in terms of the PM and x
-    #Make a second loop which allows for a SUM of Kraus operators. 
-    sigma = np.zeros((n,n))
+
+def optimize(CG,IG):
+    pms = permutation_matrix(CG)[0]
+    swap_index = permutation_matrix(CG)[1]
+    #Define the function which we want to optimize 
+    def f(x):
+        f = 0
+        #define the krauss operator in terms of the PM and x
+        #Make a second loop which allows for a SUM of Kraus operators. 
+        sigma = np.zeros((n,n))
+        for i in range(len(pms)):
+            sigma += ((np.dot(np.dot(np.sqrt(x[i])*pms[i],rho(CG)),np.sqrt(x[i])*pms[i])))
+        f = Q_jsd(sigma,rho(IG))
+        return f
+
+    #Format the constraints for Optimisation
+    def constraint1(x):
+        return np.array([np.sum(x)-1])   
+    con1 = {'type': 'eq', 'fun': constraint1}
+    bounds = [(0,1)]
+    cons=[con1]
+
+    #Optimize for the function f 
+    #Generate a random set of theta's with a value between 0-1
+    x0 = np.random.uniform(0,1,len(pms))
+    #Preform the optimizatoion
+    sol = sp.optimize.minimize(f,x0,constraints=cons,bounds=bounds,method='SLSQP',tol=1e-18)
+
+    #print the results in such a manner that they can be analysed
+    index = []
+    P = []
+    res = []
     for i in range(len(pms)):
-        sigma += ((np.dot(np.dot(np.sqrt(x[i])*pms[i],rho(CG)),np.sqrt(x[i])*pms[i])))
-        #sigma_proj = np.dot(np.dot(P1,sigma),P1)
-    f = Q_jsd(sigma,rho(IG))
-    return f
+        res.append(sol.x[i])
+        index.append(i)
+        P.append(pms[i])
+    print(sol)
+    print(res)
+    print(x0)
+    print(P)
+    print(swap_index[np.argmax(res)])
+    print(np.sum(IG_iteration(IG,CG)))
+    print(f(x0),Q_jsd(rho(IG),rho(CG)),sol.fun)
+    print(f(x0)-sol.fun,Q_jsd(rho(IG),rho(CG))-sol.fun)
+    print("--- %s seconds ---" % (time.time() - start_time))
+    SWAPS.append(swap_index[np.argmax(res)])
+    return SWAPS
 
-#Format the constraints for Optimisation
-def constraint1(x):
-    return np.array([np.sum(x)-1])   
-con1 = {'type': 'eq', 'fun': constraint1}
-bounds = [(0,1)]
-cons=[con1]
-#Optimize for the function f 
-#Generate a random set of theta's with a value between 0-1
-x0 = np.random.uniform(0,1,len(pms))
-#Preform the optimizatoion
-sol = sp.optimize.minimize(f,x0,constraints=cons,bounds=bounds,method='SLSQP',tol=1e-18)
+i=0
+while np.sum(IG_iteration(IG,CG))!=0: 
+    s = optimize(CG,IG)
+    IG = IG_iteration(IG,CG)
+    CG = CG_swap(s[i][0],s[i][1],CG)
+    i+=1
+    print(IG)
+    print(CG)
+    
 
-#print the results in such a manner that they can be analysed
-index = []
-P = []
-res = []
-for i in range(len(pms)):
-    res.append(sol.x[i])
-    index.append(i)
-    P.append(pms[i])
-print(sol)
-print(res)
-print(x0)
-print(P)
-print(f(x0),Q_jsd(rho(IG),rho(CG)),sol.fun)
-print(f(x0)-sol.fun,Q_jsd(rho(IG),rho(CG))-sol.fun)
+print(SWAPS, len(SWAPS))
+
