@@ -111,7 +111,7 @@ for b in benchmarks:
 
 df =  pd.DataFrame(data, columns =   ["benchmarks names","number of swaps", "device name"]) 
 #writer = pd.ExcelWriter(curdir + "/compilation_res.xlsx", engine='openpyxl', mode='a', if_sheet_exists='overlay')
-#file = pd.read_excel(r'C:/Users/mbandic/Desktop/PhD/Code/Subgraph isomorphism project/compilation_res.xlsx')
+#file = pd.read_excel(r'/compilation_results.xlsx')
 #df.to_excel(writer,index=False,header=False,startrow=len(file)+1)
 df.to_excel(curdir + "/compilation_results.xlsx", index=False)
 #writer.close()
